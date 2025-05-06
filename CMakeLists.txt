@@ -27,7 +27,14 @@ target_include_directories(glbasimac PUBLIC third_party/glad/include)
 target_link_libraries(glbasimac PUBLIC glad)
 
 # Create executable
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} 
+src/main.cpp
+src/Tile.cpp
+src/Map.cpp)
+
+# Include directories
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE

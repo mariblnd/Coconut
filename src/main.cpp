@@ -16,8 +16,7 @@ static float aspectRatio = 1.0f;
 /* OpenGL Engine */
 GLBI_Engine myEngine;
 
-GLBI_Convex_2D_Shape cercle;
-GLBI_Convex_2D_Shape triangle;
+GLBI_Convex_2D_Shape carre;
 
 static float rouge = 0.2f;
 static float vert = 0.0f;
@@ -77,12 +76,40 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void initScene(){
-
+	std::vector<float> coords = {
+		-0.05f,  0.05f,
+		-0.05f, -0.05f,
+		 0.05f, -0.05f,
+		 0.05f,  0.05f
+	};
+	carre.initShape(coords);
+	carre.changeNature(GL_TRIANGLE_FAN);
 }
 
-void renderScene(){
+void renderScene() {
+	int rows = 20;
+	int cols = 20;
+	float squareSize = 0.1f;
 
+	for (int i = 0; i < rows; ++i) {
+		for (int j = 0; j < cols; ++j) {
+			float x = -1.0f + j * squareSize;
+			float y =  1.0f - i * squareSize;
+
+			if ((i + j) % 2 == 0)
+				glColor3f(1.0f, 1.0f, 1.0f); // blanc
+			else
+				glColor3f(0.0f, 0.0f, 0.0f); // noir
+
+			glPushMatrix();
+			glTranslatef(x + squareSize / 2.0f, y - squareSize / 2.0f, 0.0f);
+			carre.drawShape();
+			glPopMatrix();
+		}
+	}
 }
+
+
 
 
 int main() {
@@ -96,7 +123,7 @@ int main() {
 	glfwSetErrorCallback(onError);
 
     // Create a windowed mode window and its OpenGL context
-    GLFWwindow* window = glfwCreateWindow(1200, 800, "Coconut", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1000, 1000, "Coconut", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return -1;
@@ -123,7 +150,7 @@ int main() {
 
     initScene();
 
-	onWindowResized(window,1200, 800);
+	onWindowResized(window,1000,1000);
 
 	
 
