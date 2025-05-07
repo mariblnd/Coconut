@@ -4,6 +4,10 @@
 #include "glbasimac/glbi_engine.hpp"
 #include "glbasimac/glbi_set_of_points.hpp"
 #include "glbasimac/glbi_convex_2D_shape.hpp"
+
+#include "Map.hpp"
+#include "Tile.hpp"
+
 #include <iostream>
 #include <cmath>
 
@@ -16,27 +20,20 @@ static float aspectRatio = 1.0f;
 /* OpenGL Engine */
 GLBI_Engine myEngine;
 
-GLBI_Convex_2D_Shape carre;
 
-static float rouge = 0.2f;
+
+Map myMap(20,20); // Crée une carte de 20x20
+
+GLBI_Convex_2D_Shape wallTiles;  
+GLBI_Convex_2D_Shape emptyTiles;
+
+std::vector<float> wallVertices;
+std::vector<float> emptyVertices;
+
+
+static float rouge = 0.0f;
 static float vert = 0.0f;
 static float bleu = 0.0f;
-
-std::vector<float> create_points_for_circle(float ray){
-
-	std::vector<float> coord_pts;
-	std::vector<float> center = {0.0f, 0.0f};	
-
-	int nb_de_points = 30;
-
-	for(int i = 0; i < nb_de_points; i++){
-		float x = center[0] + ray * cos((i*2*M_PI)/nb_de_points);
-		float y = center[1] + ray * sin((i*2*M_PI)/nb_de_points);
-		coord_pts.push_back(x);
-		coord_pts.push_back(y);
-	}
-	return coord_pts;
-}
 
 
 /* Error handling function */
@@ -75,40 +72,34 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         
 }
 
-void initScene(){
-	std::vector<float> coords = {
-		-0.05f,  0.05f,
-		-0.05f, -0.05f,
-		 0.05f, -0.05f,
-		 0.05f,  0.05f
-	};
-	carre.initShape(coords);
-	carre.changeNature(GL_TRIANGLE_FAN);
+void initScene() {
+    // Séparer les vertices selon le type
+    for(const auto& current_tile : myMap.getTiles()) {
+        auto tileVertices = current_tile.getVertices();
+        if(current_tile.type == TileType::WALL) {
+            wallVertices.insert(wallVertices.end(), tileVertices.begin(), tileVertices.end());
+        } else {
+            emptyVertices.insert(emptyVertices.end(), tileVertices.begin(), tileVertices.end());
+        }
+    }
+    
+    // Initialiser les deux formes
+    wallTiles.changeNature(GL_TRIANGLE_FAN);
+    wallTiles.initShape(wallVertices);
+    
+    emptyTiles.changeNature(GL_TRIANGLE_FAN);
+    emptyTiles.initShape(emptyVertices);
 }
 
 void renderScene() {
-	int rows = 20;
-	int cols = 20;
-	float squareSize = 0.1f;
-
-	for (int i = 0; i < rows; ++i) {
-		for (int j = 0; j < cols; ++j) {
-			float x = -1.0f + j * squareSize;
-			float y =  1.0f - i * squareSize;
-
-			if ((i + j) % 2 == 0)
-				glColor3f(1.0f, 1.0f, 1.0f); // blanc
-			else
-				glColor3f(0.0f, 0.0f, 0.0f); // noir
-
-			glPushMatrix();
-			glTranslatef(x + squareSize / 2.0f, y - squareSize / 2.0f, 0.0f);
-			carre.drawShape();
-			glPopMatrix();
-		}
-	}
+    // WALL
+    myEngine.setFlatColor(0.0f, 0.0f, 0.0f);
+    wallTiles.drawShape();
+    
+    // EMPTY TILES
+    myEngine.setFlatColor(0.5f, 0.5f, 0.5f);
+    emptyTiles.drawShape();
 }
-
 
 
 

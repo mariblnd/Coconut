@@ -27,6 +27,7 @@
 #include <vector>
 #include "globals.hpp"
 #include "gl_tools.hpp"
+#include <cassert>
 
 namespace STP3D {
 
@@ -101,6 +102,7 @@ namespace STP3D {
 		if(v) std::cout << "Initialization of the shader program : ";
 		if(!programObject) {
 			if(v) {
+				assert(false);
 				std::cout << "[FAILED]" << std::endl;
 				printLog(programObject,false,0);
 				std::cout << "Shader will not be used" << std::endl;
